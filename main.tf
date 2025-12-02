@@ -17,6 +17,19 @@ resource "google_compute_network" "vpc_network" {
   name = "terraform-network"
 }
 
+resource "google_compute_firewall" "allow_ssh_http_https" {
+  name    = "allow-ssh-http-https"
+  network = google_compute_network.vpc_network.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22", "80", "443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["web"]
+}
+
 resource "google_compute_instance" "vm_instance" {
   name         = "terraform-instance"
   machine_type = "e2-small"
@@ -25,8 +38,8 @@ resource "google_compute_instance" "vm_instance" {
 
   boot_disk {
     initialize_params {
-      # image = "debian-cloud/debian-12"
-      image = "cos-cloud/cos-stable"
+      image = "debian-cloud/debian-12"
+    
     }
   }
 
